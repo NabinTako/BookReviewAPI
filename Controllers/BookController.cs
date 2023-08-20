@@ -1,5 +1,6 @@
 ﻿using BookReview.Models;
 using BookReview.Services.BookServices;
+using BookReview.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -12,26 +13,25 @@ namespace BookReview.Controllers {
 
 		private readonly IBookService _bookService;
 
-		public BookController(IBookService bookService)
-        {
+		public BookController(IBookService bookService) {
 			_bookService = bookService;
 		}
 
-        [HttpGet("getall")]
-		public async Task<ActionResult<ServerResponse<List<Book>>>> GetAllBooks() {
+		[HttpGet("getall")]
+		public async Task<ActionResult<ServerResponse<List<BookDto>>>> GetAllBooks() {
 			var results = await _bookService.GetAllBooks();
 			return Ok(results);
 		}
 		[HttpGet("{id}")]
-		public async Task<ActionResult<ServerResponse<Book>>> GetBookById(int id) {
+		public async Task<ActionResult<ServerResponse<BookDto>>> GetBookById(int id) {
 			var results = await _bookService.GetBookById(id);
-			if(results.Data == null) {
+			if (results.Data == null) {
 				return NotFound(results);
 			}
 			return results;
 		}
 		[HttpGet("tag/{tag}")]
-		public async Task<ActionResult<ServerResponse<List<Book>>>> GetBookByTag(Tag tag) {
+		public async Task<ActionResult<ServerResponse<List<BookDto>>>> GetBookByTag(string tag) {
 			var results = await _bookService.GetBookByTag(tag); 
 			if (results.Data == null) {
 				return NotFound(results);
@@ -39,7 +39,7 @@ namespace BookReview.Controllers {
 			return Ok(results);
 		}
 		[HttpPost("add")]
-		public async Task<ActionResult<ServerResponse<List<Book>>>> AddBook(Book newBook) {
+		public async Task<ActionResult<ServerResponse<List<BookDto>>>> AddBook(BookDto newBook) {
 			var results = await _bookService.AddBook(newBook);
 			if (results.Data == null) {
 				return NotFound(results);
@@ -47,7 +47,7 @@ namespace BookReview.Controllers {
 			return Ok(results);
 		}
 		[HttpDelete("{id}")]
-		public async Task<ActionResult<ServerResponse<List<Book>>>> DeleteBook(int id) {
+		public async Task<ActionResult<ServerResponse<List<BookDto>>>> DeleteBook(int id) {
 			var results = await _bookService.DeleteBook(id);
 			if (results.Data == null) {
 				return NotFound(results);

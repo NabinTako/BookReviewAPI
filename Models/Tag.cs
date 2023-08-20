@@ -1,10 +1,13 @@
-﻿using System.Text.Json.Serialization;
-
+﻿
 namespace BookReview.Models {
-	[JsonConverter(typeof(JsonStringEnumConverter))]
-	public enum Tag {
-		Horror = 2,
-		Romance = 5,
-		Sci_Fi = 3
+	//public enum Tag {
+	//	Romance = 1,
+	//	Sci_Fi = 2,
+	//	Horror = 3
+	//}
+	public  class Tag {
+		public int Id { get; set; }
+		public string Name { get; set; } = "unTagged";
+
 	}
 }
