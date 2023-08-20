@@ -15,7 +15,7 @@ namespace BookReview.Services.BookServices {
 		public async Task<ServerResponse<List<BookDto>>> GetAllBooks() {
 			var response = new ServerResponse<List<BookDto>>();
 			var bookList = await _dbContext.Books.Include(b => b.Tags).ToListAsync();
-			response.Data = BookToBookDtoConverter(await _dbContext.Books.ToListAsync());
+			response.Data = BookListToBookDtoListConverter(await _dbContext.Books.ToListAsync());
 			return response;
 		}
 		public async Task<ServerResponse<BookDto>> GetBookById(int id) {
@@ -35,14 +35,14 @@ namespace BookReview.Services.BookServices {
 			return response;
 		}
 		public async Task<ServerResponse<List<BookDto>>> GetBookByTag(string tag) {
-			//List<BookDto> FilteredBook = new List<BookDto>();
+			List<BookDto> filteredBook = new List<BookDto>();
 			var response = new ServerResponse<List<BookDto>>();
 			var books = _dbContext.Books.Include(b => b.Tags).ToList();
 			foreach (var book in books) {
 				if (book.Tags.Count > 0) {
 					foreach (var bookTag in book.Tags) {
 						if (bookTag.Name.Equals(tag, StringComparison.OrdinalIgnoreCase)) {
-							response.Data.Add(new BookDto {
+							filteredBook.Add(new BookDto {
 								Name = book.Name,
 								Aurthor = book.Aurthor,
 								Description = book.Description,
@@ -52,6 +52,8 @@ namespace BookReview.Services.BookServices {
 					}
 				}
 			}
+			response.Data = filteredBook;
+
 			if (response.Data.Count == 0) {
 				response.Sucess = false;
 				response.Message = $"Books with tag '{tag}' not found";
@@ -61,15 +63,19 @@ namespace BookReview.Services.BookServices {
 		}
 		public async Task<ServerResponse<List<BookDto>>> AddBook(BookDto newBook) {
 			var response = new ServerResponse<List<BookDto>>();
-			Console.WriteLine(newBook+ " ___________________");
+			List<Tag> bookTags = new List<Tag>();
+			foreach (var tag in newBook.Tags) {
+				bookTags.Add(new Tag { Name = tag });
+			}
 			var bookToAdd = new Book {
 				Name = newBook.Name,
 				Aurthor = newBook.Aurthor,
 				Description = newBook.Description,
-				Tags = BookTagToStore(newBook.Tags!),
+				Tags = bookTags
 			};
 			_dbContext.Books.Add(bookToAdd);
-			response.Data = BookToBookDtoConverter(await _dbContext.Books.ToListAsync());
+			await _dbContext.SaveChangesAsync();
+			response.Data = BookListToBookDtoListConverter(await _dbContext.Books.Include(b => b.Tags).ToListAsync());
 			return response;
 		}
 
@@ -83,7 +89,7 @@ namespace BookReview.Services.BookServices {
 			}
 			_dbContext.Remove(bookToDelete);
 			await _dbContext.SaveChangesAsync();
-			response.Data = BookToBookDtoConverter(await _dbContext.Books.ToListAsync());
+			response.Data = BookListToBookDtoListConverter(await _dbContext.Books.Include(b => b.Tags).ToListAsync());
 			return response;
 		}
 
@@ -100,14 +106,17 @@ namespace BookReview.Services.BookServices {
 		// List Tags to show __________________
 		private List<string> BookTags(Book book) {
 			var tags = new List<string>();
-			foreach (var item in book.Tags!) {
-				tags.Add(item.Name);
+			if (book.Tags.Count > 0) {
+				foreach (var item in book.Tags!) {
+					tags.Add(item.Name);
+				}
 			}
 			return tags;
 		}
 		// Book view model Lists ______________________
-		private List<BookDto> BookToBookDtoConverter(List<Book> bookList) {
+		private List<BookDto> BookListToBookDtoListConverter(List<Book> bookList) {
 			List<BookDto> booksDto = new List<BookDto>();
+
 			foreach (var book in bookList) {
 				booksDto.Add(new BookDto {
 					Name = book.Name,
