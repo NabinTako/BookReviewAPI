@@ -9,6 +9,7 @@ namespace BookReview.Services.BookServices {
 		public Task<ServerResponse<List<BookDto>>> AddBook(BookDto newBook);
 		public Task<ServerResponse<List<BookDto>>> DeleteBook(int id);
 		public Task<ServerResponse<BookDto>> GetBookById(int id);
+		public Task<ServerResponse<BookDetailsDto>> GetBookDetailsById(int id);
 		public Task<ServerResponse<List<BookDto>>> GetBookByTag(string tag);
 	}
 }

@@ -30,6 +30,15 @@ namespace BookReview.Controllers {
 			}
 			return results;
 		}
+
+		[HttpGet("details/{id}")]
+		public async Task<ActionResult<ServerResponse<BookDetailsDto>>> GetBookDetailsById(int id) {
+			var results = await _bookService.GetBookDetailsById(id);
+			if (results.Data == null) {
+				return NotFound(results);
+			}
+			return results;
+		}
 		[HttpGet("tag/{tag}")]
 		public async Task<ActionResult<ServerResponse<List<BookDto>>>> GetBookByTag(string tag) {
 			var results = await _bookService.GetBookByTag(tag); 

@@ -30,7 +30,7 @@ namespace BookReview.Services.BookServices {
 				Name = book.Name,
 				Aurthor = book.Aurthor,
 				Description = book.Description,
-				Tags = BookTags(book)
+				Tags = BookTagsToStringList(book)
 			};
 			return response;
 		}
@@ -46,7 +46,7 @@ namespace BookReview.Services.BookServices {
 								Name = book.Name,
 								Aurthor = book.Aurthor,
 								Description = book.Description,
-								Tags = BookTags(book)
+								Tags = BookTagsToStringList(book)
 							});
 						}
 					}
@@ -63,15 +63,15 @@ namespace BookReview.Services.BookServices {
 		}
 		public async Task<ServerResponse<List<BookDto>>> AddBook(BookDto newBook) {
 			var response = new ServerResponse<List<BookDto>>();
-			List<Tag> bookTags = new List<Tag>();
-			foreach (var tag in newBook.Tags) {
-				bookTags.Add(new Tag { Name = tag });
-			}
+			//List<Tag> bookTags = new List<Tag>();
+			//foreach (var tag in newBook.Tags) {
+			//	bookTags.Add(new Tag { Name = tag });
+			//}
 			var bookToAdd = new Book {
 				Name = newBook.Name,
 				Aurthor = newBook.Aurthor,
 				Description = newBook.Description,
-				Tags = bookTags
+				Tags = BookTagToStore(newBook.Tags)
 			};
 			_dbContext.Books.Add(bookToAdd);
 			await _dbContext.SaveChangesAsync();
@@ -93,6 +93,27 @@ namespace BookReview.Services.BookServices {
 			return response;
 		}
 
+		public async Task<ServerResponse<BookDetailsDto>> GetBookDetailsById(int id) {
+			var response = new ServerResponse<BookDetailsDto>();
+			var book = await _dbContext.Books.Include(b => b.Tags).FirstOrDefaultAsync(b => b.Id == id);
+			if (book == null) {
+				response.Sucess = false;
+				response.Message = $"Book with id '{id}' notfound";
+				return response;
+			}
+			var bookCommentsRef = await _dbContext.BookDetails.Include(b => b.Comments).FirstOrDefaultAsync(b => b.BookId == id);
+			BookDetailsDto bookDetails = new BookDetailsDto() {
+				Name = book.Name,
+				Aurthor = book.Aurthor,
+				Description = book.Description,
+				Tags = BookTagsToStringList(book),
+				Comments = BookCommentsToStringList(bookCommentsRef)
+			}; 
+			response.Data = bookDetails;
+			return response;
+		}
+
+
 		//------------------------------------ Convetrter functions ------------------------------------
 		//
 		//function to store tags inside the new books 
@@ -104,7 +125,7 @@ namespace BookReview.Services.BookServices {
 			return tags;
 		}
 		// List Tags to show __________________
-		private List<string> BookTags(Book book) {
+		private List<string> BookTagsToStringList(Book book) {
 			var tags = new List<string>();
 			if (book.Tags.Count > 0) {
 				foreach (var item in book.Tags!) {
@@ -112,6 +133,16 @@ namespace BookReview.Services.BookServices {
 				}
 			}
 			return tags;
+		}
+		// List of book comments
+		private List<string> BookCommentsToStringList(BookDetails book) {
+			var comments = new List<string>();
+			if (book.Comments.Count > 0) {
+				foreach (var item in book.Comments) {
+					comments.Add(item.comment);
+				}
+			}
+			return comments;
 		}
 		// Book view model Lists ______________________
 		private List<BookDto> BookListToBookDtoListConverter(List<Book> bookList) {
@@ -122,7 +153,7 @@ namespace BookReview.Services.BookServices {
 					Name = book.Name,
 					Aurthor = book.Aurthor,
 					Description = book.Description,
-					Tags = BookTags(book)
+					Tags = BookTagsToStringList(book)
 				});
 			}
 			return booksDto;
