@@ -73,7 +73,8 @@ namespace BookReview.Services.BookServices {
 				Description = newBook.Description,
 				Tags = BookTagToStore(newBook.Tags)
 			};
-			_dbContext.Books.Add(bookToAdd);
+			 var addedBookRef = _dbContext.Books.Add(bookToAdd).Entity;
+			addedBookRef.Details = new BookDetails { BookId = addedBookRef.Id };
 			await _dbContext.SaveChangesAsync();
 			response.Data = BookListToBookDtoListConverter(await _dbContext.Books.Include(b => b.Tags).ToListAsync());
 			return response;
@@ -87,7 +88,10 @@ namespace BookReview.Services.BookServices {
 				response.Message = $"Book with id '{id}' notfound";
 				return response;
 			}
-			_dbContext.Remove(bookToDelete);
+			foreach (var tag in bookToDelete.Tags) {
+				_dbContext.Tag.Remove(tag);
+			}
+			_dbContext.Books.Remove(bookToDelete);
 			await _dbContext.SaveChangesAsync();
 			response.Data = BookListToBookDtoListConverter(await _dbContext.Books.Include(b => b.Tags).ToListAsync());
 			return response;
@@ -112,7 +116,21 @@ namespace BookReview.Services.BookServices {
 			response.Data = bookDetails;
 			return response;
 		}
-
+		public async Task<ServerResponse<AddCommentDto>>  AddComment(AddCommentDto comments) {
+			var response = new ServerResponse<AddCommentDto>();
+			var bookDetails = await _dbContext.BookDetails.FirstOrDefaultAsync(b => b.BookId == comments.BookId);
+            if (bookDetails == null)
+            {
+                response.Sucess = false;
+				response.Message = $"Book with id {comments.BookId} not found";
+            }
+            _dbContext.Comment.Add(new Comment {
+				BookDetailsId = bookDetails.Id,
+				comment = comments.Comment
+			}) ;
+			await _dbContext.SaveChangesAsync();
+			return response;
+		}
 
 		//------------------------------------ Convetrter functions ------------------------------------
 		//
@@ -134,7 +152,7 @@ namespace BookReview.Services.BookServices {
 			}
 			return tags;
 		}
-		// List of book comments
+		// List of bookDetails comments
 		private List<string> BookCommentsToStringList(BookDetails book) {
 			var comments = new List<string>();
 			if (book.Comments.Count > 0) {

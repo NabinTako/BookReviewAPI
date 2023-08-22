@@ -47,7 +47,7 @@ namespace BookReview.Controllers {
 			}
 			return Ok(results);
 		}
-		[HttpPost("add")]
+		[HttpPost("addbook")]
 		public async Task<ActionResult<ServerResponse<List<BookDto>>>> AddBook(BookDto newBook) {
 			var results = await _bookService.AddBook(newBook);
 			if (results.Data == null) {
@@ -55,6 +55,16 @@ namespace BookReview.Controllers {
 			}
 			return Ok(results);
 		}
+		[HttpPost("addcomment")]
+		public async Task<ActionResult<ServerResponse<AddCommentDto>>> AddComment(AddCommentDto comment){
+			var results = await _bookService.AddComment(comment);
+			if(results.Sucess == false) {
+				return NotFound(results);
+			}
+			return Ok(results);
+		}
+		
+
 		[HttpDelete("{id}")]
 		public async Task<ActionResult<ServerResponse<List<BookDto>>>> DeleteBook(int id) {
 			var results = await _bookService.DeleteBook(id);

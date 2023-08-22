@@ -6,6 +6,8 @@ namespace BookReview.Data {
 
 		}
 		public DbSet<Book> Books => Set<Book>();
+		public DbSet<Tag> Tag => Set<Tag>();
 		public DbSet<BookDetails> BookDetails => Set<BookDetails>();
+		public DbSet<Comment> Comment => Set<Comment>();
 	}
 }

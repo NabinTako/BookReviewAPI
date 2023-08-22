@@ -33,7 +33,8 @@ namespace BookReview.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BookId = table.Column<int>(type: "int", nullable: true)
-                },
+					
+		},
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tag", x => x.Id);
@@ -41,7 +42,8 @@ namespace BookReview.Migrations
                         name: "FK_Tag_Books_BookId",
                         column: x => x.BookId,
                         principalTable: "Books",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

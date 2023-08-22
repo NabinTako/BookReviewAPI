@@ -11,5 +11,6 @@ namespace BookReview.Services.BookServices {
 		public Task<ServerResponse<BookDto>> GetBookById(int id);
 		public Task<ServerResponse<BookDetailsDto>> GetBookDetailsById(int id);
 		public Task<ServerResponse<List<BookDto>>> GetBookByTag(string tag);
+		public Task<ServerResponse<AddCommentDto>> AddComment(AddCommentDto comment);
 	}
 }
