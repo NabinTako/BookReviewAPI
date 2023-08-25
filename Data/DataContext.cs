@@ -9,5 +9,6 @@ namespace BookReview.Data {
 		public DbSet<Tag> Tag => Set<Tag>();
 		public DbSet<BookDetails> BookDetails => Set<BookDetails>();
 		public DbSet<Comment> Comment => Set<Comment>();
+		public DbSet<User> Users=> Set<User>();
 	}
 }

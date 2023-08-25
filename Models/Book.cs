@@ -7,6 +7,7 @@ namespace BookReview.Models {
         public string? Aurthor { get; set; }
         public string? Description { get; set; }
         public BookDetails? Details { get; set; }
-        public List<Tag>? Tags { get; set; }
+        public List<User>? StarredUsers { get; set; }
+		public List<Tag>? Tags { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using BookReview.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookReview.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230825122619_users table")]
+    partial class userstable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,21 +134,6 @@ namespace BookReview.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("BookUser", b =>
-                {
-                    b.Property<int>("StarredBooksId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StarredUsersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("StarredBooksId", "StarredUsersId");
-
-                    b.HasIndex("StarredUsersId");
-
-                    b.ToTable("BookUser");
-                });
-
             modelBuilder.Entity("BookReview.Models.BookDetails", b =>
                 {
                     b.HasOne("BookReview.Models.Book", "Book")
@@ -173,21 +161,6 @@ namespace BookReview.Migrations
                     b.HasOne("BookReview.Models.Book", null)
                         .WithMany("Tags")
                         .HasForeignKey("BookId");
-                });
-
-            modelBuilder.Entity("BookUser", b =>
-                {
-                    b.HasOne("BookReview.Models.Book", null)
-                        .WithMany()
-                        .HasForeignKey("StarredBooksId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BookReview.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("StarredUsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("BookReview.Models.Book", b =>
