@@ -2,6 +2,7 @@
 
 using BookReview.Models;
 using BookReview.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookReview.Services.BookServices {
@@ -15,7 +16,19 @@ namespace BookReview.Services.BookServices {
 		public async Task<ServerResponse<List<BookDto>>> GetAllBooks() {
 			var response = new ServerResponse<List<BookDto>>();
 			var bookList = await _dbContext.Books.Include(b => b.Tags).ToListAsync();
-			response.Data = BookListToBookDtoListConverter(await _dbContext.Books.ToListAsync());
+			response.Data = BookListToBookDtoListConverter(bookList); //_dbContext.Books.ToListAsync()
+			return response;
+		}
+		public async Task<ServerResponse<List<BookDto>>> StarredBooks(int userId) {
+			var response = new ServerResponse<List<BookDto>>();
+			try {
+				var user = await _dbContext.Users.FirstOrDefaultAsync( u => u.Id == userId);
+				var bookList = await _dbContext.Books.Include(b => b.Tags).Where(b => b.StarredUsers!.Contains(user!)).ToListAsync();
+				response.Data = BookListToBookDtoListConverter(bookList);
+			}catch (Exception ex) {
+				response.Sucess = false;
+				response.Message = ex.Message;
+			}
 			return response;
 		}
 		public async Task<ServerResponse<BookDto>> GetBookById(int id) {

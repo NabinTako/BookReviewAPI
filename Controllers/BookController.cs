@@ -1,12 +1,15 @@
 ﻿using BookReview.Models;
 using BookReview.Services.BookServices;
 using BookReview.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
+using System.Security.Claims;
 
 namespace BookReview.Controllers {
+
+	[Authorize]
 	[ApiController]
 	[Route("[controller]")]
 	public class BookController : ControllerBase {
@@ -17,11 +20,20 @@ namespace BookReview.Controllers {
 			_bookService = bookService;
 		}
 
+		[AllowAnonymous]
 		[HttpGet("getall")]
 		public async Task<ActionResult<ServerResponse<List<BookDto>>>> GetAllBooks() {
 			var results = await _bookService.GetAllBooks();
 			return Ok(results);
 		}
+
+		[HttpGet("starred")]
+		public async Task<ActionResult<ServerResponse<List<BookDto>>>> StarredBooks() {
+			int id = int.Parse( User.Claims.FirstOrDefault( c => c.Type == ClaimTypes.NameIdentifier)!.Value );
+			var results = await _bookService.StarredBooks(id);
+			return Ok(results);
+		}
+
 		[HttpGet("{id}")]
 		public async Task<ActionResult<ServerResponse<BookDto>>> GetBookById(int id) {
 			var results = await _bookService.GetBookById(id);
