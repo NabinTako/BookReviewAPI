@@ -22,8 +22,9 @@ namespace BookReview.Services.BookServices {
 		public async Task<ServerResponse<List<BookDto>>> StarredBooks(int userId) {
 			var response = new ServerResponse<List<BookDto>>();
 			try {
-				var user = await _dbContext.Users.FirstOrDefaultAsync( u => u.Id == userId);
-				var bookList = await _dbContext.Books.Include(b => b.Tags).Where(b => b.StarredUsers!.Contains(user!)).ToListAsync();
+				var user = await _dbContext.Users.Include(u => u.StarredBooks!).ThenInclude(b => b.Tags).FirstOrDefaultAsync( u => u.Id == userId);
+				var bookList = user.StarredBooks;
+				//var bookList = await _dbContext.Books.Include(b => b.Tags).Where(b => b.StarredUsers!.Contains(user!)).ToListAsync();
 				response.Data = BookListToBookDtoListConverter(bookList);
 			}catch (Exception ex) {
 				response.Sucess = false;
@@ -90,6 +91,26 @@ namespace BookReview.Services.BookServices {
 			addedBookRef.Details = new BookDetails { BookId = addedBookRef.Id };
 			await _dbContext.SaveChangesAsync();
 			response.Data = BookListToBookDtoListConverter(await _dbContext.Books.Include(b => b.Tags).ToListAsync());
+			return response;
+		}
+		public async Task<ServerResponse<BookDto>> Starred(int bookId,int userId) {
+			var response = new ServerResponse<BookDto>();
+			var user = await _dbContext.Users.Include(u => u.StarredBooks).FirstOrDefaultAsync(u => u.Id == userId);
+			var book = await _dbContext.Books.Include(b=> b.Tags).Include(b=> b.StarredUsers).FirstOrDefaultAsync(b => b.Id == bookId);
+			if (user.StarredBooks.Contains(book)) {
+				response.Sucess = false;
+				response.Message = "Book already starred";
+				return response;
+			}
+			book.StarredUsers.Add(user);
+			user.StarredBooks.Add(book);
+			await _dbContext.SaveChangesAsync();
+			response.Data = new BookDto {
+				Name = book.Name,
+				Aurthor = book.Aurthor,
+				Description = book.Description,
+				Tags = BookTagsToStringList(book)
+			};
 			return response;
 		}
 

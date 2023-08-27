@@ -67,6 +67,16 @@ namespace BookReview.Controllers {
 			}
 			return Ok(results);
 		}
+
+		[HttpPost("starbook")]
+		public async Task<ActionResult<ServerResponse<BookDto>>> Starred(int bookId) {
+			int userId = int.Parse( User.Claims.FirstOrDefault( c => c.Type == ClaimTypes.NameIdentifier)!.Value );
+			var results = await _bookService.Starred(bookId, userId);
+			if (results.Data == null) {
+				return NotFound(results);
+			}
+			return Ok(results);
+		}
 		[HttpPost("addcomment")]
 		public async Task<ActionResult<ServerResponse<AddCommentDto>>> AddComment(AddCommentDto comment){
 			var results = await _bookService.AddComment(comment);
