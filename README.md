@@ -14,6 +14,7 @@ Run `update-database` in VS after you have changed the server link to your serve
 
 ![image](https://github.com/NabinTako/BookReviewAPI/assets/109028119/36234360-015d-4faf-a549-cab851285e32)
 
+![image](https://github.com/NabinTako/BookReviewAPI/assets/109028119/44e5ea22-d0f0-46c7-bd3a-ad668391b4ef)
+
 ![image](https://github.com/NabinTako/BookReviewAPI/assets/109028119/ef76eb8d-5550-4269-9f20-dbf4595f687b)
 
-![image](https://github.com/NabinTako/BookReviewAPI/assets/109028119/44e5ea22-d0f0-46c7-bd3a-ad668391b4ef)
