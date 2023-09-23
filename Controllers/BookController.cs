@@ -11,6 +11,7 @@ namespace BookReview.Controllers {
 
 	[Authorize]
 	[ApiController]
+	//[AllowAnonymous]
 	[Route("[controller]")]
 	public class BookController : ControllerBase {
 

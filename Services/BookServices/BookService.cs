@@ -41,6 +41,7 @@ namespace BookReview.Services.BookServices {
 				return response;
 			}
 			response.Data = new BookDto {
+				Id = book.Id,
 				Name = book.Name,
 				Aurthor = book.Aurthor,
 				Description = book.Description,
@@ -57,6 +58,7 @@ namespace BookReview.Services.BookServices {
 					foreach (var bookTag in book.Tags) {
 						if (bookTag.Name.Equals(tag, StringComparison.OrdinalIgnoreCase)) {
 							filteredBook.Add(new BookDto {
+								Id = book.Id,
 								Name = book.Name,
 								Aurthor = book.Aurthor,
 								Description = book.Description,
@@ -202,6 +204,7 @@ namespace BookReview.Services.BookServices {
 
 			foreach (var book in bookList) {
 				booksDto.Add(new BookDto {
+					Id = book.Id,
 					Name = book.Name,
 					Aurthor = book.Aurthor,
 					Description = book.Description,
